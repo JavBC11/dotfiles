@@ -11,9 +11,9 @@ purpleColour="\e[0;35m\033[1m"
 # Global variables
 dir=$(pwd)
 user=$(whoami)
-dotfiles_dir="$dir/dotfiles/.config"
-dotfile_zsh="$dir/dotfiles/"
-dotfile_bin="$dir/dotfiles/bin"
+dotfiles_dir="$dir/.config"
+dotfile_zsh="$dir/"
+dotfile_bin="$dir/bin"
 
 trap ctrl_c INT
 
@@ -30,7 +30,7 @@ else
 	echo -e "\n\n${blueColour}[*] Installing necessary packages\n${endColour}"
 	sleep 2
 	sudo pacman -Syu --noconfirm
-	sudo pacman -S --noconfirm blueman brightnessctl fastfetch git htop hyprlock hyprpaper lsd nautilus neovim pamixer pavucontrol python-pip ttf-font-awesome ttf-jetbrains-mono ttf-jetbrains-mono-nerd waybar zsh zsh-autosuggestions zsh-syntax-highlighting
+	sudo pacman -S --noconfirm bat blueman brightnessctl fastfetch git htop hyprlock hyprpaper lsd nautilus nwg-look neovim pamixer papirus-icon-theme pavucontrol python-pip python-distutils-extra rofi-wayland ttf-font-awesome ttf-jetbrains-mono ttf-jetbrains-mono-nerd waybar zsh zsh-autosuggestions zsh-syntax-highlighting
 	if [ $? != 0 ] && [ $? != 130 ]; then
 		echo -e "\n${redColour}[-] Failed to install some packages!\n${endColour}"
 		exit 1
@@ -44,7 +44,7 @@ else
 
 	echo -e "\n${purpleColour}[*] Installing necessary dependencies of pip\n${endColour}"
 	sleep 2
-	pip install psutils gputil pyamdgpuinfo inquirer loguru pyyaml colorama --break-system-packages
+	pip install psutil gputil pyamdgpuinfo inquirer loguru pyyaml colorama --break-system-packages
 	if [ $? != 0 ] && [ $? != 130 ]; then
 		echo -e "\n${redColour}[-] Failed to install some dependencies for pip\n${endColour}"
 		exit 1
@@ -53,7 +53,7 @@ else
 		sleep 1.5
 	fi
 
-	# Installing yay & hyprshot
+	# Installing yay & packages
 	if ! command -v yay &>/dev/null; then
 		echo -e "\n${purpleColour}[*] Installing yay...${endColour}"
 		sudo pacman -S --needed --noconfirm git base-devel
@@ -62,12 +62,13 @@ else
 	echo -e "\n${greenColour}[+] Done installation of yay...\n${endColour}"
 	sleep 1.5
 
-	echo -e "\n${purpleColour}[*] Installing hyprshot...${endColour}"
-	yay -S --noconfirm hyprshot
-	echo -e "\n${greenColour}[+] Done installation of hyprshot...\n${endColour}"
+	echo -e "\n${purpleColour}[*] Installing package with yay${endColour}"
+	yay -S --noconfirm hyprshot bibata-cursor-git catppuccin-gtk-theme-mocha
+	echo -e "\n${greenColour}[+] Done installation yay package...\n${endColour}"
 	sleep 1.5
 
-	echo -e "\n${purpleColour}[*] Installing Oh My Zsh to the $user...\n${endColour}"
+  #zsh config
+	echo -e "\n${purpleColour}[*] Installing Oh My Zsh to user $user...\n${endColour}"
 	sleep 2
 	sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 	if [ $? != 0 ] && [ $? != 130 ]; then
@@ -78,8 +79,9 @@ else
 		sleep 1.5
 	fi
 
+  #copy configs
 	echo -e "\n${blueColour}[*] Copy configs to ~/.config${endColour}"
-	config_dirs=(dunst fastfetch hypr kitty waybar nvim rofi)
+	config_dirs=(dunst fastfetch gtk-3.0 gtk-4.0 hypr kitty waybar nvim rofi)
 	for dir in "${config_dirs[@]}"; do
 		mkdir -p "$HOME/.config/$dir"
 		cp -r "$dotfiles_dir/$dir"/* "$HOME/.config/$dir/"

@@ -62,24 +62,24 @@ sudo pacman -Syu --noconfirm
 ```
 
 ```bash
-sudo pacman -S --noconfirm blueman brightnessctl fastfetch git htop hyprlock hyprpaper lsd nautilus neovim pamixer pavucontrol python-pip ttf-font-awesome ttf-jetbrains-mono ttf-jetbrains-mono-nerd waybar zsh zsh-autosuggestions zsh-syntax-highlighting
+sudo pacman -S --noconfirm bat blueman brightnessctl fastfetch git htop hyprlock hyprpaper lsd nautilus nwg-look neovim pamixer papirus-icon-theme pavucontrol python-pip python-distutils-extra rofi-wayland ttf-font-awesome ttf-jetbrains-mono ttf-jetbrains-mono-nerd waybar zsh zsh-autosuggestions zsh-syntax-highlighting
 ```
 
 ```bash
-pip install psutils gputil pyamdgpuinfo inquirer loguru pyyaml colorama --break-system-packages
+pip install psutil gputil pyamdgpuinfo inquirer loguru pyyaml colorama --break-system-packages
 ```
 yay installation
 ```bash
 sudo pacman -S --noconfirm --needed git base-devel && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si
 ```
-installation hyprshot
+installation package with yay
 ```bash
-yay -S --noconfirm hyprshot
+yay -S --noconfirm hyprshot bibata-cursor-git catppuccin-gtk-theme-mocha
 ```
 finally, copy the configurations
 
 ```bash
-dirs=(dunst fastfetch hypr kitty nvim rofi waybar)
+dirs=(dunst fastfetch gtk-3.0 gtk-4.0 hypr kitty waybar nvim rofi)
 
 for dir in "${dirs[@]}"; do
     mkdir -p "$HOME/.config/$dir"

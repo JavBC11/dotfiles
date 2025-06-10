@@ -45,8 +45,7 @@ dummywall {
     orientation:                 horizontal;
     children:                    [ "mode-switcher" ];
     background-color:            transparent;
-   /* background-image:            url("~/.config/meowrch/current_wallpaper", height);*/
-    background-image:            url("~/Pictures/wallpaper/ArchChan.jpg", height);
+    background-image:            url("~/.config/hypr/wallpaper/ArchChan.jpg", height);
 }
 
 
