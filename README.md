@@ -23,6 +23,7 @@ My dotfiles
 ![gallery](assets/assets3.webp)
 ![gallery](assets/assets4.webp)
 ![gallery](assets/assets5.webp)
+![gallery](assets/assets6.webp)
 
 <!-- HOTKEYS -->
 ## HotKeys
