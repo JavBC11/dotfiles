@@ -62,7 +62,7 @@ sudo pacman -Syu --noconfirm
 ```
 
 ```bash
-sudo pacman -S --noconfirm bat blueman brightnessctl fastfetch git htop hyprlock hyprpaper lsd nautilus nwg-look neovim pamixer papirus-icon-theme pavucontrol python-pip python-distutils-extra rofi-wayland ttf-font-awesome ttf-jetbrains-mono ttf-jetbrains-mono-nerd waybar zsh zsh-autosuggestions zsh-syntax-highlighting
+sudo pacman -S --noconfirm bat blueman brightnessctl cava dunst fastfetch feh flatpak git htop hyprland hyprlock hyprpaper kitty lsd nautilus nwg-look neovim pamixer papirus-icon-theme pavucontrol python-pip python-distutils-extra qt5-wayland qt6-wayland rofi-wayland ttf-font-awesome ttf-jetbrains-mono ttf-jetbrains-mono-nerd wget waybar xdg-desktop-portal-hyprland xdg-utils yazi zsh zsh-autosuggestions zsh-syntax-highlighting
 ```
 
 ```bash

@@ -10,10 +10,9 @@ purpleColour="\e[0;35m\033[1m"
 
 # Global variables
 dir=$(pwd)
-user=$(whoami)
 dotfiles_dir="$dir/.config"
-dotfile_zsh="$dir/"
 dotfile_bin="$dir/bin"
+packages=(bat blueman brightnessctl cava dunst fastfetch feh flatpak git htop hyprland hyprlock hyprpaper kitty lsd nautilus nwg-look neovim pamixer papirus-icon-theme pavucontrol python-pip python-distutils-extra qt5-wayland qt6-wayland rofi-wayland ttf-font-awesome ttf-jetbrains-mono ttf-jetbrains-mono-nerd wget waybar xdg-desktop-portal-hyprland xdg-utils yazi zsh zsh-autosuggestions zsh-syntax-highlighting)
 
 trap ctrl_c INT
 
@@ -22,35 +21,37 @@ function ctrl_c() {
 	exit 1
 }
 
-if [ "$user" == "root" ]; then
+if [ "$EUID" -eq 0 ]; then
 	echo -e "\n\n${redColour}[!] You should not run the script as the root user!\n${endColour}"
 	exit 1
 else
 	sleep 1
 	echo -e "\n\n${blueColour}[*] Installing necessary packages\n${endColour}"
-	sleep 2
-	sudo pacman -Syu --noconfirm
-	sudo pacman -S --noconfirm bat blueman brightnessctl fastfetch git htop hyprlock hyprpaper lsd nautilus nwg-look neovim pamixer papirus-icon-theme pavucontrol python-pip python-distutils-extra rofi-wayland ttf-font-awesome ttf-jetbrains-mono ttf-jetbrains-mono-nerd waybar zsh zsh-autosuggestions zsh-syntax-highlighting
-	if [ $? != 0 ] && [ $? != 130 ]; then
-		echo -e "\n${redColour}[-] Failed to install some packages!\n${endColour}"
-		exit 1
-	else
-		echo -e "\n${greenColour}[+] Done installing necessary packages...\n${endColour}"
-		sleep 1.5
-	fi
-
-	echo -e "\n${blueColour}[*] Starting installation of necessary dependencies for the environment...\n${endColour}"
-	sleep 0.5
+	sudo pacman -Syu --noconfirm 
+  for pkg in "${packages[@]}"; do
+    echo -ne "${yellowColour}[*] Verifying package: $pkg...${endColour} "
+    
+    if pacman -Si "$pkg" &>/dev/null; then
+      echo -e "${greenColour}[FOUND]${endColour}"
+      if ! sudo pacman -S --noconfirm "$pkg"; then
+        echo -e "${redColour}[-] Failed to install: $pkg${endColour}"
+        exit 1
+      fi
+    else
+      echo -e "${redColour}[NOT FOUND]${endColour}"
+      echo -e "${redColour}[-] Package '$pkg' not found in repositories. Exiting.${endColour}"
+      exit 1
+    fi
+  done
+  echo -e "\n${greenColour}[+] All packages installed successfully.${endColour}"
 
 	echo -e "\n${purpleColour}[*] Installing necessary dependencies of pip\n${endColour}"
-	sleep 2
 	pip install psutil gputil pyamdgpuinfo inquirer loguru pyyaml colorama --break-system-packages
 	if [ $? != 0 ] && [ $? != 130 ]; then
 		echo -e "\n${redColour}[-] Failed to install some dependencies for pip\n${endColour}"
 		exit 1
 	else
 		echo -e "\n${greenColour}[+] Done pip depedencies...\n${endColour}"
-		sleep 1.5
 	fi
 
 	# Installing yay & packages
@@ -60,52 +61,85 @@ else
 		git clone https://aur.archlinux.org/yay.git ~/yay && (cd ~/yay && makepkg -si --noconfirm) && rm -rf ~/yay
 	fi
 	echo -e "\n${greenColour}[+] Done installation of yay...\n${endColour}"
-	sleep 1.5
 
 	echo -e "\n${purpleColour}[*] Installing package with yay${endColour}"
 	yay -S --noconfirm hyprshot bibata-cursor-git catppuccin-gtk-theme-mocha
 	echo -e "\n${greenColour}[+] Done installation yay package...\n${endColour}"
-	sleep 1.5
 
-  #zsh config
-	echo -e "\n${purpleColour}[*] Installing Oh My Zsh to user $user...\n${endColour}"
-	sleep 2
-	sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-	if [ $? != 0 ] && [ $? != 130 ]; then
-		echo -e "\n${redColour}[-] Failed to install Oh My Zsh $user!\n${endColour}"
-		exit 1
-	else
-		echo -e "\n${greenColour}[+] Done installing Oh My Zsh...\n${endColour}"
-		sleep 1.5
-	fi
+  #install zsh and conf
+  echo -e "\n${purpleColour}[*] Do you want to install Oh My Zsh? ([Y]/n)${endColour}"
+  read -r install_omz
+  install_omz=${install_omz:-"y"}
+  
+  if [[ "$install_omz" =~ ^[Yy]$ ]]; then
+    echo -e "\n${purpleColour}[*] Installing Oh My Zsh for user $user...\n${endColour}"
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+  
+    if [ $? -ne 0 ]; then
+      echo -e "\n${redColour}[-] Failed to install Oh My Zsh for $user!\n${endColour}"
+      exit 1
+    else
+      echo -e "\n${greenColour}[+] Done installing Oh My Zsh...\n${endColour}"
+    fi
+  
+    echo -e "\n${yellowColour}[?] Do you want to copy your custom .zshrc config? ([Y]/n)${endColour}"
+    read -r copy_zshrc
+    copy_zshrc=${copy_zshrc:-"y"}
+  
+    if [[ "$copy_zshrc" =~ ^[Yy]$ ]]; then
+      cp "$pwd/.zshrc" "$HOME"
+      echo -e "${greenColour}[+] .zshrc copied to $HOME${endColour}"
+    else
+      echo -e "${blueColour}[*] Skipped copying .zshrc${endColour}"
+    fi
+  else
+    echo -e "${blueColour}[*] Skipped Oh My Zsh installation${endColour}"
+  fi
+  
+  echo -e "\n${yellowColour}[?] Do you want to change your default shell to zsh? ([Y]/n)${endColour}"
+  read -r change_shell
+  change_shell=${change_shell:-"y"}
+  
+  if [[ "$change_shell" =~ ^[Yy]$ ]]; then
+    chsh -s /bin/zsh
+    echo -e "${greenColour}[+] Default shell changed to zsh for user $user${endColour}"
+  else
+    echo -e "${blueColour}[*] Skipped changing default shell${endColour}"
+  fi
 
-  #copy configs
-	echo -e "\n${blueColour}[*] Copy configs to ~/.config${endColour}"
-	config_dirs=(dunst fastfetch gtk-3.0 gtk-4.0 hypr kitty waybar nvim rofi)
-	for dir in "${config_dirs[@]}"; do
-		mkdir -p "$HOME/.config/$dir"
-		cp -r "$dotfiles_dir/$dir"/* "$HOME/.config/$dir/"
-	done
-	echo -e "\n${greenColour}[+] Done Copy configs...\n${endColour}"
-	sleep 1.5
+  #copy .config & create backup
+  echo -e "\n${blueColour}[*] Backing up and copying configs to ~/.config${endColour}"
+  
+  config_dirs=(dunst fastfetch gtk-3.0 gtk-4.0 hypr kitty waybar nvim rofi)
+  backup_dir="$HOME/backup/$(date +%Y%m%d_%H%M%S)"
+  
+  mkdir -p "$backup_dir"
+  
+  for dir in "${config_dirs[@]}"; do
+    if [ -d "$HOME/.config/$dir" ]; then
+      echo -e "${yellowColour}[*] Backing up existing $dir to $backup_dir${endColour}"
+      mkdir -p "$backup_dir/$dir"
+      cp -r "$HOME/.config/$dir/"* "$backup_dir/$dir/"
+    fi
+  
+    echo -e "${blueColour}[*] Installing config: $dir${endColour}"
+    mkdir -p "$HOME/.config/$dir"
+    cp -r "$dotfiles_dir/$dir/"* "$HOME/.config/$dir/"
+  done
+  
+  echo -e "\n${greenColour}[+] Done backing up and copying configs to ~/.config${endColour}"
 
-	echo -e "${blueColour}[*] Coping .zshrc & change shell${endColour}"
-	cp $dotfile_zsh/.zshrc $HOME
-	chsh -s /bin/zsh
-	echo -e "${greenColour}[+] Done moving .zshrc & change shell for zsh...${endColour}"
-	sleep 1.5
-
+  #directory bin, for some modules of waybar and rofi
 	echo -e "\n${blueColour}[*] Copy directory bin${endColour}"
 	cp -r "$dotfile_bin" "$HOME"
 	echo -e "\n${greenColour}[+] Done copy directory bin to $HOME...\n${endColour}"
-	sleep 1.5
 
 	while true; do
 		echo -en "\n${yellowColour}[?] It's necessary to restart the system. Do you want to restart the system now? ([y]/n) ${endColour}"
 		read -r
 		REPLY=${REPLY:-"y"}
 		if [[ $REPLY =~ ^[Yy]$ ]]; then
-			echo -e "\n\n${greenColour}[+] Restarting the system...\n${endColor}"
+			echo -e "\n\n${greenColour}[+] Restarting the system...\n${endColour}"
 			sleep 1
 			sudo reboot
 		elif [[ $REPLY =~ ^[Nn]$ ]]; then
