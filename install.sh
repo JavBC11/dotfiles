@@ -87,7 +87,7 @@ else
     copy_zshrc=${copy_zshrc:-"y"}
   
     if [[ "$copy_zshrc" =~ ^[Yy]$ ]]; then
-      cp "$pwd/.zshrc" "$HOME"
+      cp "$pwd/".zshrc "$HOME"
       echo -e "${greenColour}[+] .zshrc copied to $HOME${endColour}"
     else
       echo -e "${blueColour}[*] Skipped copying .zshrc${endColour}"
