@@ -12,7 +12,7 @@ purpleColour="\e[0;35m\033[1m"
 dir=$(pwd)
 dotfiles_dir="$dir/.config"
 dotfile_bin="$dir/bin"
-packages=(bat blueman brightnessctl cava dunst fastfetch feh flatpak git htop hyprland hyprlock hyprpaper kitty lsd nautilus nwg-look neovim pamixer papirus-icon-theme pavucontrol python-pip python-distutils-extra qt5-wayland qt6-wayland rofi-wayland ttf-font-awesome ttf-jetbrains-mono ttf-jetbrains-mono-nerd wget waybar xdg-desktop-portal-hyprland xdg-utils yazi zsh zsh-autosuggestions zsh-syntax-highlighting)
+packages=(bat blueman brightnessctl cava dunst fastfetch feh flatpak git htop hyprland hyprlock hyprpaper kitty lsd nautilus nwg-look neovim pamixer papirus-icon-theme pavucontrol python-pip python-distutils-extra qt5-wayland qt6-wayland rofi-wayland ttf-jetbrains-mono ttf-jetbrains-mono-nerd wget waybar xdg-desktop-portal-hyprland xdg-utils yazi zsh zsh-autosuggestions zsh-syntax-highlighting)
 
 trap ctrl_c INT
 
@@ -87,7 +87,7 @@ else
     copy_zshrc=${copy_zshrc:-"y"}
   
     if [[ "$copy_zshrc" =~ ^[Yy]$ ]]; then
-      cp "$pwd/".zshrc "$HOME"
+      cp "$PWD/.zshrc" "$HOME"
       echo -e "${greenColour}[+] .zshrc copied to $HOME${endColour}"
     else
       echo -e "${blueColour}[*] Skipped copying .zshrc${endColour}"
